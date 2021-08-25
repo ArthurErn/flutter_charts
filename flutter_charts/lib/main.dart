@@ -31,10 +31,12 @@ class Charts extends StatefulWidget {
 
 class _ChartsState extends State<Charts> {
   List<SalesData> _chartData;
+  List<GDPData> _gdpData;
 
   @override
   void initState() {
     _chartData = getChartData();
+    _gdpData = getGDPData();
     super.initState();
   }
 
@@ -42,31 +44,71 @@ class _ChartsState extends State<Charts> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Container(
-          height: 550,
-          width: 360,
-          child: SfCartesianChart(
-            title: ChartTitle(text: 'Yearly sales analysis'),
-            tooltipBehavior: TooltipBehavior(enable: true),
-            series: <ChartSeries>[
-              LineSeries<SalesData, double>(
-                  name: "Vendas",
-                  dataSource: _chartData,
-                  xValueMapper: (SalesData sales, _) => sales.year,
-                  yValueMapper: (SalesData sales, _) => sales.sales,
-                  dataLabelSettings: DataLabelSettings(isVisible: true),
-                  enableTooltip: true)
-            ],
-            primaryXAxis:
-                NumericAxis(edgeLabelPlacement: EdgeLabelPlacement.shift),
-            primaryYAxis: NumericAxis(
-                labelFormat: '{value}M',
-                numberFormat: NumberFormat.simpleCurrency(decimalDigits: 0)),
-          ),
+        child: Column(
+          children: [
+            Container(
+              height: 450,
+              width: 360,
+              child: SfCartesianChart(
+                title: ChartTitle(text: 'Yearly sales analysis'),
+                tooltipBehavior: TooltipBehavior(enable: true),
+                series: <ChartSeries>[
+                  LineSeries<SalesData, double>(
+                      name: "Vendas",
+                      dataSource: _chartData,
+                      xValueMapper: (SalesData sales, _) => sales.year,
+                      yValueMapper: (SalesData sales, _) => sales.sales,
+                      dataLabelSettings: DataLabelSettings(isVisible: true),
+                      enableTooltip: true)
+                ],
+                primaryXAxis:
+                    NumericAxis(edgeLabelPlacement: EdgeLabelPlacement.shift),
+                primaryYAxis: NumericAxis(
+                    labelFormat: '{value}M',
+                    numberFormat:
+                        NumberFormat.simpleCurrency(decimalDigits: 0)),
+              ),
+            ),
+            Container(
+              height: 350,
+              width: 360,
+              child: SfCircularChart(
+                  title: ChartTitle(text: "Continent Wise GDP"),
+                  legend: Legend(
+                      isVisible: true,
+                      overflowMode: LegendItemOverflowMode.wrap),
+                  series: <CircularSeries>[
+                    PieSeries<GDPData, String>(
+                        dataSource: _gdpData,
+                        xValueMapper: (GDPData data, _) => data.continent,
+                        yValueMapper: (GDPData data, _) => data.gdp,
+                        dataLabelSettings: DataLabelSettings(isVisible: true))
+                  ]),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+List<GDPData> getGDPData() {
+  final List<GDPData> gdpData = [
+    GDPData('Oceania', 1600),
+    GDPData('Africa', 2490),
+    GDPData('South America', 2900),
+    GDPData('Europe', 23050),
+    GDPData('North America', 24880),
+    GDPData('Asia', 34390),
+  ];
+  return gdpData;
+}
+
+class GDPData {
+  GDPData(this.continent, this.gdp);
+
+  final String continent;
+  final int gdp;
 }
 
 List<SalesData> getChartData() {
